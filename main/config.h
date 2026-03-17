@@ -1,6 +1,6 @@
 #pragma once
 
-#define MDNS_SERVICE_TYPENAME "_esp32coolmon"
+#define MDNS_SERVICE_TYPENAME "_cryowallhomesecurityserver"
 
 #define MOSI -1 //not used
 #define MISO GPIO_NUM_19
