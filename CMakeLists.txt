@@ -8,4 +8,4 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 #idf_component_register("tasks.c"
 #    INCLUDE_DIRS "./main"
 #    REQUIRES driver)
-project(CoolantMonitor)
+project(HomeSecurityClientA)
