@@ -118,7 +118,7 @@ void app_main(void){
 	printf("Connecting to the following server:\n");
 	mdns_print_result(result);
 
-	int socketfd = 0;
+	int32_t socketfd = 0;
 
 	uint32_t address = result->addr->next->addr.u_addr.ip4.addr;
 
@@ -157,7 +157,16 @@ void app_main(void){
 	sprintf(sendBuff, "%"PRIu32":%s\n", deviceID, DEVICE_TYPE);
 
 	// send existing id to server
-	write(socketfd, sendBuff, strlen(sendBuff));
+	uint32_t bytes_sent = 0;
+	while(bytes_sent < strlen(sendBuff)){
+		int32_t socketStatus = send(socketfd, sendBuff + bytes_sent, strlen(sendBuff), 0);
+		if(socketStatus == -1){
+			break;
+		}else{
+			bytes_sent += socketStatus;
+		}
+	}
+
 	printf("ID to server: %s\n", sendBuff);
 
 	// receive a new ID or an echo of the current one
@@ -168,7 +177,7 @@ void app_main(void){
 	ret = nvs_set_u32(nvsHandle, "devID", *recvBuff);
 	ESP_ERROR_CHECK(ret);
 
-	int socketStatus = 0;
+	int32_t socketStatus = 0;
 	while(socketStatus != -1){
 
 		fflush(stdout);
@@ -190,7 +199,15 @@ void app_main(void){
 		printf("==================================================================================\n");
 		fflush(stdout);
 
-		socketStatus = send(socketfd, &sendbuff, strlen(sendbuff), 0);
+		uint32_t bytes_sent = 0;
+		while(bytes_sent < strlen(sendBuff)){
+			socketStatus = send(socketfd, sendbuff + bytes_sent, strlen(sendbuff), 0);
+			if(socketStatus == -1){
+				break;
+			}else{
+				bytes_sent += socketStatus;
+			}
+		}
 
 		vTaskDelay(2000/portTICK_PERIOD_MS);
 	}
