@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
+#include <freertos/FreeRTOS.h>
 
-#include "funcs.h"
 #include "network.h"
 #include "config.h"
 
