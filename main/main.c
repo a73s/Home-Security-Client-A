@@ -118,7 +118,7 @@ void app_main(void){
 	printf("Connecting to the following server:\n");
 	mdns_print_result(result);
 
-	int32_t socketfd = 0;
+	int socketfd = 0;
 
 	uint32_t address = result->addr->next->addr.u_addr.ip4.addr;
 
