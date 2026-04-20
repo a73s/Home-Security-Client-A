@@ -27,7 +27,7 @@ static const char *TAG = "MAIN";
 
 volatile bool dataButtonHit = false;
 
-#define DEVICE_TYPE "dooropen"
+#define DEVICE_TYPE "door_sensor"
 
 void app_main(void){
 
@@ -191,12 +191,25 @@ void app_main(void){
 	ret = nvs_set_u32(nvsHandle, "devID", *recvBuff);
 	ESP_ERROR_CHECK(ret);
 
+	uint32_t iteration = 0;
 	while(socketStatus != -1){
 
+		iteration++;
 		vTaskDelay(5000/portTICK_PERIOD_MS);
 
 		bool isOpenEvent = false;
 		bool isCloseEvent = false;
+
+		// TODO: remove this
+		{
+			if(iteration == 10){
+				isOpenEvent = true;
+			}
+			if(iteration == 20){
+				isCloseEvent = true;
+				iteration = 0;
+			}
+		}
 
 		// TODO: add sensor stuff here
 
