@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
+#include <errno.h>
 
 #include "command.h"
 #include "config.h"
@@ -157,13 +158,33 @@ void app_main(void){
 	sprintf(sendBuff, "%"PRIu32":%s\n", deviceID, DEVICE_TYPE);
 
 	// send existing id to server
-	uint32_t bytes_sent = 0;
-	int32_t socketStatus = send(socketfd, sendBuff + bytes_sent, strlen(sendBuff), 0);
+	int32_t socketStatus = 0;
+	uint32_t received_bytes = 0;
+	while(received_bytes < strlen(sendBuff)) {
+		socketStatus = send(socketfd, sendBuff, strlen(sendBuff), 0);
+		if(socketStatus == 0) {
+			printf("Zero Bytes sent, errno: %d\n", errno);
+			break;
+		}
+		if(socketStatus == -1){
+			break;
+		}
+		received_bytes += socketStatus;
+	}
+
+	if(socketStatus == -1) {
+		printf("Socket Closed");
+		abort();
+	}
 
 	printf("ID to server: %s\n", sendBuff);
 
 	// receive a new ID or an echo of the current one
-	read(socketfd, recvBuff, 64);
+	socketStatus = recv(socketfd, recvBuff, 64, 0);
+	if(socketStatus == -1) {
+		printf("Socket Closed on read");
+		abort();
+	}
 
 	printf("ID from server: %"PRIu32"\n", *recvBuff);
 
@@ -172,7 +193,8 @@ void app_main(void){
 
 	while(socketStatus != -1){
 
-		char sendbuff[256] = {0};
+		vTaskDelay(5000/portTICK_PERIOD_MS);
+
 		bool isOpenEvent = false;
 		bool isCloseEvent = false;
 
@@ -185,14 +207,26 @@ void app_main(void){
 		}else{
 			sprintf(sendBuff, "NONE\n");
 		}
-		printf("Message Size %d\n", strlen(sendBuff));
 
 		printf("==================================================================================\n");
 		fflush(stdout);
 
-		socketStatus = send(socketfd, sendbuff, strlen(sendbuff), 0);
+		uint32_t received_bytes = 0;
+		while(received_bytes < strlen(sendBuff)) {
+			socketStatus = send(socketfd, sendBuff, strlen(sendBuff), 0);
+			if(socketStatus == 0) {
+				printf("Zero Bytes sent, errno: %d\n", errno);
+				break;
+			}
+			if(socketStatus == -1){
+				break;
+			}
+			received_bytes += socketStatus;
+		}
 
-		vTaskDelay(2000/portTICK_PERIOD_MS);
+		if(socketStatus == -1) {
+			printf("Socket Closed on read");
+		}
 	}
 	close(socketfd);
 	abort();
