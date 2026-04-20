@@ -158,14 +158,7 @@ void app_main(void){
 
 	// send existing id to server
 	uint32_t bytes_sent = 0;
-	while(bytes_sent < strlen(sendBuff)){
-		int32_t socketStatus = send(socketfd, sendBuff + bytes_sent, strlen(sendBuff), 0);
-		if(socketStatus == -1){
-			break;
-		}else{
-			bytes_sent += socketStatus;
-		}
-	}
+	int32_t socketStatus = send(socketfd, sendBuff + bytes_sent, strlen(sendBuff), 0);
 
 	printf("ID to server: %s\n", sendBuff);
 
@@ -177,10 +170,7 @@ void app_main(void){
 	ret = nvs_set_u32(nvsHandle, "devID", *recvBuff);
 	ESP_ERROR_CHECK(ret);
 
-	int32_t socketStatus = 0;
 	while(socketStatus != -1){
-
-		fflush(stdout);
 
 		char sendbuff[256] = {0};
 		bool isOpenEvent = false;
@@ -195,19 +185,12 @@ void app_main(void){
 		}else{
 			sprintf(sendBuff, "NONE\n");
 		}
+		printf("Message Size %d\n", strlen(sendBuff));
 
 		printf("==================================================================================\n");
 		fflush(stdout);
 
-		uint32_t bytes_sent = 0;
-		while(bytes_sent < strlen(sendBuff)){
-			socketStatus = send(socketfd, sendbuff + bytes_sent, strlen(sendbuff), 0);
-			if(socketStatus == -1){
-				break;
-			}else{
-				bytes_sent += socketStatus;
-			}
-		}
+		socketStatus = send(socketfd, sendbuff, strlen(sendbuff), 0);
 
 		vTaskDelay(2000/portTICK_PERIOD_MS);
 	}
