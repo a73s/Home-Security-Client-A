@@ -195,23 +195,23 @@ void app_main(void){
 	while(socketStatus != -1){
 
 		iteration++;
-		vTaskDelay(5000/portTICK_PERIOD_MS);
+		vTaskDelay(10000/portTICK_PERIOD_MS);
 
 		bool isOpenEvent = false;
 		bool isCloseEvent = false;
 
 		// TODO: remove this
 		{
-			if(iteration == 10){
+			if(iteration == 4){
 				isOpenEvent = true;
 			}
-			if(iteration == 20){
+			if(iteration == 8){
 				isCloseEvent = true;
 				iteration = 0;
 			}
 		}
 
-		// TODO: add sensor stuff here
+		// TODO: add sensor reading stuff here
 
 		if(isOpenEvent){
 			sprintf(sendBuff, "TRUE\n");
